@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import persistence.Persistencia;
 
 public class Funcionario extends Usuario {
     private static final long serialVersionUID = 1L;
@@ -42,6 +43,7 @@ public class Funcionario extends Usuario {
             } else if (funcionario.matricula >= proximaMatricula) {
                 proximaMatricula = funcionario.matricula + 1;
             }
+            Persistencia.salvarDados();
         }
     }
 
@@ -165,6 +167,7 @@ public class Funcionario extends Usuario {
         setCpf(cpfTratado);
         this.email = emailTratado;
         this.senha = senha;
+        Persistencia.salvarDados();
     }
 
     public List<Funcionario> listarFuncionarios() {
@@ -182,6 +185,7 @@ public class Funcionario extends Usuario {
             throw new IllegalStateException("Apenas gerentes podem alterar o cargo de funcionarios.");
         }
         this.gerente = gerente;
+        Persistencia.salvarDados();
     }
 
     public Funcionario buscarFuncionario(String cpf) {
@@ -227,5 +231,14 @@ public class Funcionario extends Usuario {
 
     public boolean isGerente() {
         return this.gerente;
+    }
+
+    protected static int obterProximaMatricula() {
+        return proximaMatricula;
+    }
+
+    protected static void restaurarEstadoFuncionario(int novaProximaMatricula) {
+        proximaMatricula = Math.max(1, novaProximaMatricula);
+        funcionarioLogado = null;
     }
 }

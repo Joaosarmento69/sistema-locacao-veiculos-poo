@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import persistence.Persistencia;
 
 public class Locacao implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -105,6 +106,7 @@ public class Locacao implements Serializable {
         Veiculo.registrarLocacaoPlaca(veiculo.getPlaca());
         Locacao novaLocacao = new Locacao(proximoCodigo++, cliente, veiculo, retirada, prevista);
         locacoes.add(novaLocacao);
+        Persistencia.salvarDados();
         return novaLocacao;
     }
 
@@ -132,6 +134,7 @@ public class Locacao implements Serializable {
         }
         this.dataRetirada = new Date(dataRetirada.getTime());
         this.dataDevolucaoPrevista = new Date(dataDevolucaoPrevista.getTime());
+        Persistencia.salvarDados();
     }
 
     public void finalizarLocacao(Date dataReal) {
@@ -157,6 +160,7 @@ public class Locacao implements Serializable {
                 veiculoCadastrado.liberarVeiculo();
             }
         }
+        Persistencia.salvarDados();
     }
 
     public double calcularValor() {
@@ -267,5 +271,18 @@ public class Locacao implements Serializable {
 
     public Veiculo getVeiculo() {
         return this.veiculo;
+    }
+
+    protected static List<Locacao> obterListaLocacoes() {
+        return new ArrayList<>(locacoes);
+    }
+
+    protected static int obterProximoCodigo() {
+        return proximoCodigo;
+    }
+
+    protected static void restaurarLocacoes(List<Locacao> lista, int novoProximoCodigo) {
+        locacoes = (lista != null) ? new ArrayList<>(lista) : new ArrayList<>();
+        proximoCodigo = Math.max(1, novoProximoCodigo);
     }
 }

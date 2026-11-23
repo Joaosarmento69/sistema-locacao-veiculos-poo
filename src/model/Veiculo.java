@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import persistence.Persistencia;
 
 public class Veiculo implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -62,6 +63,7 @@ public class Veiculo implements Serializable {
         }
         Veiculo novoVeiculo = new Veiculo(placaTratada, modelo.trim(), valorDiaria);
         veiculos.add(novoVeiculo);
+        Persistencia.salvarDados();
         return novoVeiculo;
     }
 
@@ -103,6 +105,7 @@ public class Veiculo implements Serializable {
         this.modelo = modelo.trim();
         this.valorDiaria = valorDiaria;
         this.placa = placaTratada;
+        Persistencia.salvarDados();
     }
 
     public boolean excluirVeiculo(String placa) {
@@ -120,7 +123,11 @@ public class Veiculo implements Serializable {
         if (verificadorLocacao != null && verificadorLocacao.test(veiculo)) {
             return false;
         }
-        return veiculos.remove(veiculo);
+        boolean removido = veiculos.remove(veiculo);
+        if (removido) {
+            Persistencia.salvarDados();
+        }
+        return removido;
     }
 
     public List<Veiculo> listarVeiculos() {
@@ -148,6 +155,7 @@ public class Veiculo implements Serializable {
         if (this.placa != null) {
             placasComLocacao.add(this.placa.trim().toUpperCase());
         }
+        Persistencia.salvarDados();
     }
 
     public void liberarVeiculo() {
@@ -155,6 +163,7 @@ public class Veiculo implements Serializable {
             throw new IllegalStateException("Apenas veiculos locados podem ser liberados.");
         }
         this.situacao = SituacaoVeiculo.DISPONIVEL;
+        Persistencia.salvarDados();
     }
 
     public void colocarEmManutencao() {
@@ -162,6 +171,7 @@ public class Veiculo implements Serializable {
             throw new IllegalStateException("Apenas veiculos disponiveis podem ser colocados em manutencao.");
         }
         this.situacao = SituacaoVeiculo.MANUTENCAO;
+        Persistencia.salvarDados();
     }
 
     public void liberarManutencao() {
@@ -169,6 +179,7 @@ public class Veiculo implements Serializable {
             throw new IllegalStateException("Apenas veiculos em manutencao podem ter a manutencao liberada.");
         }
         this.situacao = SituacaoVeiculo.DISPONIVEL;
+        Persistencia.salvarDados();
     }
 
     public String getPlaca() {
@@ -185,5 +196,18 @@ public class Veiculo implements Serializable {
 
     public SituacaoVeiculo getSituacao() {
         return this.situacao;
+    }
+
+    protected static List<Veiculo> obterListaVeiculos() {
+        return new ArrayList<>(veiculos);
+    }
+
+    protected static Set<String> obterPlacasComLocacao() {
+        return new HashSet<>(placasComLocacao);
+    }
+
+    protected static void restaurarVeiculos(List<Veiculo> lista, Set<String> placas) {
+        veiculos = (lista != null) ? new ArrayList<>(lista) : new ArrayList<>();
+        placasComLocacao = (placas != null) ? new HashSet<>(placas) : new HashSet<>();
     }
 }

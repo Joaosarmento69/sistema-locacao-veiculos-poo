@@ -3,6 +3,7 @@ package model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import persistence.Persistencia;
 
 public abstract class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -55,6 +56,7 @@ public abstract class Usuario implements Serializable {
             proximoId = usuario.id + 1;
         }
         usuarios.add(usuario);
+        Persistencia.salvarDados();
     }
 
     public void visualizarDados() {
@@ -74,14 +76,17 @@ public abstract class Usuario implements Serializable {
         }
         this.nome = nome.trim();
         this.telefone = telefone.trim();
+        Persistencia.salvarDados();
     }
 
     public void desativar() {
         this.ativo = false;
+        Persistencia.salvarDados();
     }
 
     public void reativar() {
         this.ativo = true;
+        Persistencia.salvarDados();
     }
 
     public List<Usuario> listarUsuarios() {
@@ -126,5 +131,18 @@ public abstract class Usuario implements Serializable {
 
     protected void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    protected static List<Usuario> obterListaUsuarios() {
+        return new ArrayList<>(usuarios);
+    }
+
+    protected static int obterProximoId() {
+        return proximoId;
+    }
+
+    protected static void restaurarUsuarios(List<Usuario> lista, int novoProximoId) {
+        usuarios = (lista != null) ? new ArrayList<>(lista) : new ArrayList<>();
+        proximoId = Math.max(1, novoProximoId);
     }
 }

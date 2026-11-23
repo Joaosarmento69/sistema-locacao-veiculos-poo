@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import persistence.Persistencia;
 
 public class Cliente extends Usuario {
     private static final long serialVersionUID = 1L;
@@ -91,6 +92,7 @@ public class Cliente extends Usuario {
         }
         super.atualizarDados(nome, telefone);
         setCpf(cpfTratado);
+        Persistencia.salvarDados();
     }
 
     public List<Cliente> listarClientes() {
@@ -118,6 +120,7 @@ public class Cliente extends Usuario {
         }
         this.numeroCnh = cnhTratada;
         this.validadeCnh = new Date(validadeCnh.getTime());
+        Persistencia.salvarDados();
     }
 
     public boolean cnhEstaValida() {
